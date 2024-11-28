@@ -49,7 +49,7 @@ unsigned long elapsedTime = 0;
 bool timerRunning = false;
 int peak_voltage = 0;
 int amp = 0;
-int wait = 5000;
+unsigned long wait = 60000;
 
 //threshold for each charging state
 int stateA_Thres_min = 1011, stateA_Thres_max = 1023;
@@ -287,7 +287,7 @@ void Disp_Power() {
     lcd.setCursor(4, 1);
     lcd.print("UnderVoltage");
     lcd.setCursor(0, 3);
-    lcd.print("restart after 5 min");
+    lcd.print("restart after 1 min");
     undervoltageCondition = true;
     delay(wait);
   } else if (undervoltageCondition && voltage > 200) {  // Recovery from undervoltage
@@ -297,7 +297,7 @@ void Disp_Power() {
     handleStateC();
   }
 
-  if (voltage > 280) {  // over_voltage condition
+  if (voltage > 240) {  // over_voltage condition
     OV_UV_OC_condition();
     analogWrite(CP_OUT, 255);
     lcd.clear();
@@ -306,10 +306,10 @@ void Disp_Power() {
     lcd.setCursor(4, 1);
     lcd.print("Overvoltage");
     lcd.setCursor(0, 3);
-    lcd.print("restart after 5 min");
+    lcd.print("restart after 1 min");
     overvoltageCondition = true;
     delay(wait);
-  } else if (overvoltageCondition && voltage < 280) {  // Recovery from over_voltage
+  } else if (overvoltageCondition && voltage < 240) {  // Recovery from over_voltage
     overvoltageCondition = false;
     handleStateA();
     handleStateB();
@@ -324,7 +324,7 @@ void Disp_Power() {
     lcd.setCursor(4, 1);
     lcd.print("UnderVoltage");
     lcd.setCursor(0, 3);
-    lcd.print("restart after 5 min");
+    lcd.print("restart after 1 min");
     overCurrentCondition = true;
     delay(wait);
   } else if (overCurrentCondition && current < 20) {  // Recovery from over_voltage
@@ -390,7 +390,6 @@ void handleStateA() {
     displayTime();
 
     if (Oscilate > 100) {  // Earth pin oscillation detected
-      lcd.clear();
       lcd.setCursor(11, 2);
       lcd.print("Earth= OK");
     } else {
@@ -471,25 +470,6 @@ void handleStateC() {
       break;
     }
   }
-}
-void handleStateB_unpug() {
-  digitalWrite(POWER_RELAY, LOW);
-  analogWrite(CP_OUT, 255);
-  // analogWrite(CP_OUT, 255*0.26);
-  digitalWrite(Power_LED, HIGH);
-  digitalWrite(Fault_LED, LOW);
-  digitalWrite(READY_Charge_LED, HIGH);
-  digitalWrite(BUZZER, LOW);
-  buzzerActivated = false;
-  if (timerRunning) {
-    elapsedTime = millis() - startTime;
-    timerRunning = false;
-  }
-  lcd.clear();
-  displayTime();
-  Disp_Power();
-  lcd.setCursor(14, 0);
-  lcd.print("Unplug");
 }
 void loop() {
 
