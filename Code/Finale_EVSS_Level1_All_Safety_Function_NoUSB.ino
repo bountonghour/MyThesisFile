@@ -49,7 +49,7 @@ unsigned long elapsedTime = 0;
 bool timerRunning = false;
 int peak_voltage = 0;
 int amp = 0;
-int wait = 60*1000;
+unsigned long wait = 60000;
 
 //threshold for each charging state
 int stateA_Thres_min = 1011, stateA_Thres_max = 1023;
